@@ -2,8 +2,9 @@
 using PatientManagement.WPF.Models;
 using PatientManagement.WPF.Services;
 using PatientManagement.WPF.Views;
-using System.Windows;
 using System.Linq;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace PatientManagement.WPF;
 
@@ -34,9 +35,11 @@ public partial class MainWindow : Window
     {
         _patients = await _patientService.GetPatients();
 
+        txtNoRecords.Visibility = _patients.Any() ? Visibility.Collapsed : Visibility.Visible;
         txtSearch.Clear();
 
         PatientsGrid.ItemsSource = _patients;
+
     }
 
     private Patient? SelectedPatient =>
@@ -169,30 +172,30 @@ public partial class MainWindow : Window
         window.ShowDialog();
     }
 
-    private void txtSearch_TextChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    private void txtSearch_TextChanged(object sender, TextChangedEventArgs e)
     {
         string keyword = txtSearch.Text.Trim().ToLower();
 
+        List<Patient> filtered;
+
         if (string.IsNullOrWhiteSpace(keyword))
         {
-            PatientsGrid.ItemsSource = _patients;
-            return;
+            filtered = _patients;
+        }
+        else
+        {
+            filtered = _patients.Where(p =>
+                p.Name.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                p.Gender.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                p.ContactNumber.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                p.Address.Contains(keyword, StringComparison.OrdinalIgnoreCase) ||
+                p.Id.ToString().Contains(keyword)
+            ).ToList();
         }
 
-        var filtered = _patients.Where(p =>
-
-            p.Name.ToLower().Contains(keyword)
-
-            || p.Gender.ToLower().Contains(keyword)
-
-            || p.ContactNumber.ToLower().Contains(keyword)
-
-            || p.Address.ToLower().Contains(keyword)
-
-            || p.Id.ToString().Contains(keyword)
-
-        ).ToList();
-
         PatientsGrid.ItemsSource = filtered;
+
+        txtNoRecords.Visibility =
+            filtered.Any() ? Visibility.Collapsed : Visibility.Visible;
     }
 }

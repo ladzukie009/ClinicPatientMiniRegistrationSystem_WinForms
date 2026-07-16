@@ -127,6 +127,16 @@
 
         </DataGrid>
 
+        <TextBlock x:Name="txtNoRecords"
+           Text="No records found."
+           FontSize="16"
+           FontWeight="Bold"
+           Foreground="Gray"
+           HorizontalAlignment="Center"
+           VerticalAlignment="Center"
+           Visibility="Collapsed"/>
+
+
     </DockPanel>
 
 </Window>
